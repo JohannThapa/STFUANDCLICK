@@ -1,25 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Suspense, lazy } from 'react';
 import './App.css';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import Authentication from './components/layout/authentication';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import Layout from './components/layout';
+import routes from './routes';
+import Loader, { LoaderType } from './components/layout/loader';
+import store, { persistor } from './store';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+    <PersistGate loading={<Loader type={LoaderType.OVERLAY} />} persistor={persistor}>
+      <Suspense fallback={<Loader type={LoaderType.OVERLAY} />}>
+        <Authentication>
+          <Router>
+            <Layout>
+              {/* <Route path={routes.ROOT} component={() => <Redirect to={routes.BOARD} />} exact /> */}
+              {/* <Route path={routes.BOARD} component={lazy(() => import('components/Board'))} exact />
+              <Route path={`${routes.GAME}/:teamName`} component={lazy(() => import('components/Game'))} exact /> */}
+            </Layout>
+          </Router>
+        </Authentication>
+      </Suspense>
+    </PersistGate>
+  </Provider>
   );
 }
 
